@@ -4,7 +4,8 @@
 ##########    Check these every time you start a new project    ##########
 ##########------------------------------------------------------##########
 
-MCU   = atmega168p
+PC    = atmega2560
+MCU   = atmega2560
 F_CPU = 1000000UL  
 BAUD  = 9600UL
 ## Also try BAUD = 19200 or 38400 if you're feeling lucky.
@@ -20,9 +21,9 @@ LIBDIR = ../../AVR-Programming-Library
 ##########        (Can override.  See bottom of file.)          ##########
 ##########------------------------------------------------------##########
 
-PROGRAMMER_TYPE = usbtiny
+PROGRAMMER_TYPE = stk500
 # extra arguments to avrdude: baud rate, chip type, -F flag, etc.
-PROGRAMMER_ARGS = 	
+PROGRAMMER_ARGS = -D -b115200 -P/dev/ttyACM0
 
 ##########------------------------------------------------------##########
 ##########                  Program Locations                   ##########
@@ -127,16 +128,16 @@ squeaky_clean:
 ##########------------------------------------------------------##########
 
 flash: $(TARGET).hex 
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -U flash:w:$<
+	$(AVRDUDE) -v -c $(PROGRAMMER_TYPE) -p $(PC) $(PROGRAMMER_ARGS) -U flash:w:$<
 
 ## An alias
 program: flash
 
 flash_eeprom: $(TARGET).eeprom
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -U eeprom:w:$<
+	$(AVRDUDE) -v -c $(PROGRAMMER_TYPE) -p $(PC) $(PROGRAMMER_ARGS) -U eeprom:w:$<
 
 avrdude_terminal:
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nt
+	$(AVRDUDE) -v -c $(PROGRAMMER_TYPE) -p $(PC) $(PROGRAMMER_ARGS) -nt
 
 ## If you've got multiple programmers that you use, 
 ## you can define them here so that it's easy to switch.
@@ -171,10 +172,10 @@ EFUSE = 0x00
 FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
 
 fuses: 
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) \
+	$(AVRDUDE) -v -c $(PROGRAMMER_TYPE) -p $(PC) \
 	           $(PROGRAMMER_ARGS) $(FUSE_STRING)
 show_fuses:
-	$(AVRDUDE) -c $(PROGRAMMER_TYPE) -p $(MCU) $(PROGRAMMER_ARGS) -nv	
+	$(AVRDUDE) -v -c $(PROGRAMMER_TYPE) -p $(PC) $(PROGRAMMER_ARGS) -n
 
 ## Called with no extra definitions, sets to defaults
 set_default_fuses:  FUSE_STRING = -U lfuse:w:$(LFUSE):m -U hfuse:w:$(HFUSE):m -U efuse:w:$(EFUSE):m 
